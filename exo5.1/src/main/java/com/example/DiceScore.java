@@ -10,7 +10,17 @@ public class DiceScore {
         this.de = de;
     }
 
-    public int getScore() throws ExecutionControl.NotImplementedException {
-        throw new ExecutionControl.NotImplementedException("Not implemented function");
+    public int getScore (){
+        int scoreFirst = de.getRoll();
+        int scoreSecond = de.getRoll();
+
+        if(scoreFirst == scoreSecond){
+            if(scoreFirst == 6){
+                return 30;
+            }
+            return scoreFirst*2 + 10;
+        }else{
+            return scoreFirst < scoreSecond ? scoreSecond : scoreFirst;
+        }
     }
 }
