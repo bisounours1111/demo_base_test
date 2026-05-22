@@ -4,10 +4,10 @@ target/
 !**/src/test/**/target/
 
 ### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+exo1/.idea/modules.xml
+exo1/.idea/jarRepositories.xml
+exo1/.idea/compiler.xml
+exo1/.idea/libraries/
 *.iws
 *.iml
 *.ipr
