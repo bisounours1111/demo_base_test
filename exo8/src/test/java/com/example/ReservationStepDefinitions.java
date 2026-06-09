@@ -114,10 +114,12 @@ public class ReservationStepDefinitions {
         assertEquals(expectedMessage, thrownException.getMessage());
     }
 
-    @Then("une confirmation est envoyée à {string}")
-    public void uneConfirmationEstEnvoyee(String email) {
+    @Then("une confirmation est envoyée à {string} avec le message {string}")
+    public void uneConfirmationEstEnvoyeeAvecMessage(String email, String expectedMessage) {
         assertNull(thrownException, "La réservation a été refusée à tort.");
-        verify(notificationServiceMock).sendConfirmation(eq(email), anyString());
+        assertNotNull(confirmation, "La confirmation n'a pas été générée.");
+        assertEquals(expectedMessage, confirmation.getConfirmationMessage());
+        verify(notificationServiceMock).sendConfirmation(eq(email), eq(expectedMessage));
     }
 
     @Then("aucune confirmation n'est envoyée")
