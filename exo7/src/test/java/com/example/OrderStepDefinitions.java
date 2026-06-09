@@ -24,6 +24,8 @@ public class OrderStepDefinitions {
     private CustomerProfile currentCustomerProfile;
     private OrderReceipt generatedReceipt;
     private Exception thrownException;
+    private String lastProductReference;
+    private int lastOrderQuantity;
 
     @Given("a product with reference {string}, a price of {double} and a stock of {int}")
     public void aProductExists(String ref, double price, int stock) {
@@ -45,6 +47,8 @@ public class OrderStepDefinitions {
 
     @When("the customer orders a quantity of {int} for reference {string}")
     public void theCustomerOrders(int quantity, String ref) {
+        this.lastProductReference = ref;
+        this.lastOrderQuantity = quantity;
         Order order = new Order("customer@test.com", ref, quantity);
         try {
             this.generatedReceipt = orderService.placeOrder(order, currentCustomerProfile);
@@ -60,6 +64,12 @@ public class OrderStepDefinitions {
         assertNull(thrownException, "The order was unexpectedly refused.");
         assertNotNull(generatedReceipt, "The order receipt was not generated.");
         assertEquals(expectedAmount, generatedReceipt.getTotalAmount(), 0.01);
+        assertEquals(lastProductReference, generatedReceipt.getProductReference());
+        assertEquals(lastOrderQuantity, generatedReceipt.getQuantity());
+        assertEquals(
+                "Order confirmed for customer@test.com - Test Product",
+                generatedReceipt.getConfirmationMessage()
+        );
     }
 
     @Then("the order is refused with the message {string}")
