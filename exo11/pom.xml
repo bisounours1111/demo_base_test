@@ -15,37 +15,36 @@
     <artifactId>demo-api-spring-tdd-bdd</artifactId>
     <version>1.0.0</version>
     <name>demo-api-spring-tdd-bdd</name>
-    <description>Démo API Spring Boot avec TDD et BDD</description>
+    <description>Spring Boot API demo with TDD and BDD</description>
 
     <properties>
         <java.version>21</java.version>
         <cucumber.version>7.20.1</cucumber.version>
 
-        <!-- Version du plugin JaCoCo utilisé pour générer le rapport de couverture. -->
         <jacoco.version>0.8.14</jacoco.version>
     </properties>
 
     <dependencies>
-        <!-- Starter web : permet de créer une API REST avec Spring MVC. -->
+        <!-- REST API -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Starter validation : active les annotations comme @Valid et @NotBlank. -->
+        <!-- Bean validation -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- Starter test : contient JUnit, Mockito, AssertJ, MockMvc et les outils de test Spring. -->
+        <!-- JUnit, Mockito, MockMvc -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
-        <!-- Cucumber : moteur BDD compatible avec JUnit Platform. -->
+        <!-- Cucumber engine -->
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-junit-platform-engine</artifactId>
@@ -53,7 +52,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Cucumber Java : annotations @Given, @When, @Then, etc. -->
+        <!-- Cucumber steps -->
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
@@ -61,7 +60,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Cucumber Spring : permet d'utiliser le contexte Spring dans les steps BDD. -->
+        <!-- Cucumber + Spring -->
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-spring</artifactId>
@@ -69,7 +68,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- JUnit Platform Suite : permet de déclarer une classe de lancement Cucumber. -->
+        <!-- Cucumber test suite -->
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-suite</artifactId>
@@ -79,13 +78,13 @@
 
     <build>
         <plugins>
-            <!-- Plugin Spring Boot : permet de lancer et packager l'application. -->
+            <!-- Spring Boot plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-            <!-- Surefire exécute les tests Maven avec JUnit Platform. -->
+            <!-- Maven test runner -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -94,56 +93,24 @@
                 </configuration>
             </plugin>
 
-            <!--
-                Plugin JaCoCo : génère un rapport de couverture de code.
-
-                prepare-agent :
-                ajoute l'agent JaCoCo avant l'exécution des tests pour mesurer
-                quelles lignes/classes/méthodes sont exécutées.
-
-                report :
-                génère le rapport HTML pendant la phase Maven "verify".
-
-                Commande à utiliser :
-                mvn clean verify
-
-                Rapport généré :
-                target/site/jacoco/index.html
-            -->
+            <!-- Code coverage: mvn clean verify -> target/site/jacoco/index.html -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
 
-                <!--
-                    Exclusions JaCoCo :
-                    Ces classes seront ignorées dans le rapport de couverture.
-
-                    Attention :
-                    on n'exclut pas les classes parce qu'elles sont "difficiles à tester",
-                    mais plutôt parce qu'elles ne contiennent pas de vraie logique métier :
-                    DTO, records simples, classe main Spring Boot, configuration, etc.
-                -->
+                <!-- Skip DTOs, models, config, and simple exceptions -->
                 <configuration>
                     <excludes>
-                        <!-- Classe de démarrage Spring Boot : pas de logique métier à couvrir. -->
                         <exclude>com/example/demoapi/DemoApiApplication.class</exclude>
-
-                        <!-- Objets de transport simples : requests, responses, DTO, records. -->
                         <exclude>com/example/demoapi/dto/*.class</exclude>
                         <exclude>com/example/demoapi/dto/**/*.class</exclude>
-
-                        <!-- Modèles simples sans logique métier. -->
                         <exclude>com/example/demoapi/model/*.class</exclude>
                         <exclude>com/example/demoapi/model/**/*.class</exclude>
-
-                        <!-- Classes de configuration Spring ou Cucumber. -->
                         <exclude>com/example/demoapi/config/*.class</exclude>
                         <exclude>com/example/demoapi/config/**/*.class</exclude>
                         <exclude>com/example/demoapi/bdd/CucumberSpringConfiguration.class</exclude>
                         <exclude>com/example/demoapi/bdd/RunCucumberTest.class</exclude>
-
-                        <!-- Exceptions simples, si elles ne contiennent pas de logique métier. -->
                         <exclude>com/example/demoapi/exception/*.class</exclude>
                         <exclude>com/example/demoapi/exception/**/*.class</exclude>
                     </excludes>
