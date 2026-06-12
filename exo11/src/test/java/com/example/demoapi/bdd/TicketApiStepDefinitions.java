@@ -66,6 +66,13 @@ public class TicketApiStepDefinitions {
         }
     }
 
+    @When("I create a ticket with title {string} and no priority")
+    public void createTicketWithoutPriority(String title) throws Exception {
+        lastResult = mockMvc.perform(post("/api/tickets")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"title\":\"" + title + "\"}"));
+    }
+
     @When("I update the created ticket status to {string}")
     public void updateCreatedTicketStatus(String status) throws Exception {
         lastResult = mockMvc.perform(patch("/api/tickets/" + createdTicketId + "/status")

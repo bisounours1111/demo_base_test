@@ -32,11 +32,14 @@ class TicketServiceTest {
 
     @Test
     void shouldCreateTicket_whenTitleIsValid() {
+        // Arrange
         when(repository.save("Network issue", Priority.HIGH, TicketStatus.OPEN))
                 .thenReturn(new Ticket(1L, "Network issue", Priority.HIGH, TicketStatus.OPEN));
 
+        // Act
         Ticket result = service.create("Network issue", Priority.HIGH);
 
+        // Assert
         assertEquals(1L, result.id());
         assertEquals("Network issue", result.title());
         assertEquals(Priority.HIGH, result.priority());
@@ -45,90 +48,120 @@ class TicketServiceTest {
 
     @Test
     void shouldTrimTitle_whenCreatingTicket() {
+        // Arrange
         when(repository.save("Network issue", Priority.HIGH, TicketStatus.OPEN))
                 .thenReturn(new Ticket(1L, "Network issue", Priority.HIGH, TicketStatus.OPEN));
 
+        // Act
         Ticket result = service.create("  Network issue  ", Priority.HIGH);
 
+        // Assert
         assertEquals("Network issue", result.title());
         verify(repository).save("Network issue", Priority.HIGH, TicketStatus.OPEN);
     }
 
     @Test
     void shouldCreateTicketWithOpenStatus_whenTicketIsCreated() {
+        // Arrange
         when(repository.save("Open ticket", Priority.LOW, TicketStatus.OPEN))
                 .thenReturn(new Ticket(1L, "Open ticket", Priority.LOW, TicketStatus.OPEN));
 
+        // Act
         Ticket result = service.create("Open ticket", Priority.LOW);
 
+        // Assert
         assertEquals(TicketStatus.OPEN, result.status());
         verify(repository).save("Open ticket", Priority.LOW, TicketStatus.OPEN);
     }
 
     @Test
     void shouldThrowException_whenTitleIsBlank() {
+        // Act + Assert
         assertThrows(IllegalArgumentException.class, () -> service.create("   ", Priority.HIGH));
         verify(repository, never()).save(any(), any(), any());
     }
 
     @Test
+    void shouldThrowException_whenTitleIsTooShortAfterTrim() {
+        // Act + Assert
+        assertThrows(IllegalArgumentException.class, () -> service.create("  ab  ", Priority.HIGH));
+        verify(repository, never()).save(any(), any(), any());
+    }
+
+    @Test
     void shouldReturnTicket_whenIdExists() {
+        // Arrange
         when(repository.findById(1L)).thenReturn(Optional.of(
                 new Ticket(1L, "Existing ticket", Priority.MEDIUM, TicketStatus.OPEN)
         ));
 
+        // Act
         Ticket result = service.getById(1L);
 
+        // Assert
         assertEquals("Existing ticket", result.title());
         verify(repository).findById(1L);
     }
 
     @Test
     void shouldThrowNotFoundException_whenIdDoesNotExist() {
+        // Arrange
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
+        // Act + Assert
         assertThrows(TicketNotFoundException.class, () -> service.getById(99L));
         verify(repository).findById(99L);
     }
 
     @Test
     void shouldAllowTransitionFromOpenToInProgress() {
+        // Arrange
         var existingTicket = new Ticket(1L, "Ticket", Priority.HIGH, TicketStatus.OPEN);
         when(repository.findById(1L)).thenReturn(Optional.of(existingTicket));
 
+        // Act
         Ticket result = service.updateStatus(1L, TicketStatus.IN_PROGRESS);
 
+        // Assert
         assertEquals(TicketStatus.IN_PROGRESS, result.status());
         verify(repository).update(any(Ticket.class));
     }
 
     @Test
     void shouldAllowTransitionFromOpenToResolved() {
+        // Arrange
         var existingTicket = new Ticket(1L, "Ticket", Priority.HIGH, TicketStatus.OPEN);
         when(repository.findById(1L)).thenReturn(Optional.of(existingTicket));
 
+        // Act
         Ticket result = service.updateStatus(1L, TicketStatus.RESOLVED);
 
+        // Assert
         assertEquals(TicketStatus.RESOLVED, result.status());
         verify(repository).update(any(Ticket.class));
     }
 
     @Test
     void shouldAllowTransitionFromInProgressToResolved() {
+        // Arrange
         var existingTicket = new Ticket(1L, "Ticket", Priority.HIGH, TicketStatus.IN_PROGRESS);
         when(repository.findById(1L)).thenReturn(Optional.of(existingTicket));
 
+        // Act
         Ticket result = service.updateStatus(1L, TicketStatus.RESOLVED);
 
+        // Assert
         assertEquals(TicketStatus.RESOLVED, result.status());
         verify(repository).update(any(Ticket.class));
     }
 
     @Test
     void shouldRejectTransition_whenTicketIsAlreadyResolved() {
+        // Arrange
         var existingTicket = new Ticket(1L, "Closed ticket", Priority.LOW, TicketStatus.RESOLVED);
         when(repository.findById(1L)).thenReturn(Optional.of(existingTicket));
 
+        // Act + Assert
         assertThrows(
                 InvalidStatusTransitionException.class,
                 () -> service.updateStatus(1L, TicketStatus.IN_PROGRESS)
@@ -138,9 +171,11 @@ class TicketServiceTest {
 
     @Test
     void shouldRejectTransition_whenTransitionIsForbidden() {
+        // Arrange
         var existingTicket = new Ticket(1L, "Ticket", Priority.MEDIUM, TicketStatus.IN_PROGRESS);
         when(repository.findById(1L)).thenReturn(Optional.of(existingTicket));
 
+        // Act + Assert
         assertThrows(
                 InvalidStatusTransitionException.class,
                 () -> service.updateStatus(1L, TicketStatus.OPEN)

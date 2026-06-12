@@ -31,7 +31,12 @@ public class TicketService {
             throw new IllegalArgumentException("Title is required");
         }
 
-        return repository.save(title.trim(), priority, TicketStatus.OPEN);
+        var trimmedTitle = title.trim();
+        if (trimmedTitle.length() < 3) {
+            throw new IllegalArgumentException("Title must contain at least 3 characters");
+        }
+
+        return repository.save(trimmedTitle, priority, TicketStatus.OPEN);
     }
 
     public Ticket getById(Long id) {

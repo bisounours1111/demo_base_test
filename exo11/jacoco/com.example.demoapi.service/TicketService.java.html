@@ -31,33 +31,38 @@ public class TicketService {
 <span class="fc" id="L31">            throw new IllegalArgumentException(&quot;Title is required&quot;);</span>
         }
 
-<span class="fc" id="L34">        return repository.save(title.trim(), priority, TicketStatus.OPEN);</span>
+<span class="fc" id="L34">        var trimmedTitle = title.trim();</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        if (trimmedTitle.length() &lt; 3) {</span>
+<span class="fc" id="L36">            throw new IllegalArgumentException(&quot;Title must contain at least 3 characters&quot;);</span>
+        }
+
+<span class="fc" id="L39">        return repository.save(trimmedTitle, priority, TicketStatus.OPEN);</span>
     }
 
     public Ticket getById(Long id) {
-<span class="fc" id="L38">        return repository.findById(id)</span>
-<span class="fc" id="L39">                .orElseThrow(() -&gt; new TicketNotFoundException(id));</span>
+<span class="fc" id="L43">        return repository.findById(id)</span>
+<span class="fc" id="L44">                .orElseThrow(() -&gt; new TicketNotFoundException(id));</span>
     }
 
     public List&lt;Ticket&gt; findAll() {
-<span class="fc" id="L43">        return repository.findAll();</span>
+<span class="fc" id="L48">        return repository.findAll();</span>
     }
 
     public Ticket updateStatus(Long id, TicketStatus status) {
-<span class="fc" id="L47">        var ticket = repository.findById(id)</span>
-<span class="pc" id="L48">                .orElseThrow(() -&gt; new TicketNotFoundException(id));</span>
+<span class="fc" id="L52">        var ticket = repository.findById(id)</span>
+<span class="pc" id="L53">                .orElseThrow(() -&gt; new TicketNotFoundException(id));</span>
 
-<span class="fc bfc" id="L50" title="All 2 branches covered.">        if (!ALLOWED_TRANSITIONS.getOrDefault(ticket.status(), Set.of()).contains(status)) {</span>
-<span class="fc" id="L51">            throw new InvalidStatusTransitionException(ticket.status(), status);</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        if (!ALLOWED_TRANSITIONS.getOrDefault(ticket.status(), Set.of()).contains(status)) {</span>
+<span class="fc" id="L56">            throw new InvalidStatusTransitionException(ticket.status(), status);</span>
         }
 
-<span class="fc" id="L54">        var updated = new Ticket(ticket.id(), ticket.title(), ticket.priority(), status);</span>
-<span class="fc" id="L55">        repository.update(updated);</span>
-<span class="fc" id="L56">        return updated;</span>
+<span class="fc" id="L59">        var updated = new Ticket(ticket.id(), ticket.title(), ticket.priority(), status);</span>
+<span class="fc" id="L60">        repository.update(updated);</span>
+<span class="fc" id="L61">        return updated;</span>
     }
 
     public void deleteAll() {
-<span class="nc" id="L60">        repository.deleteAll();</span>
-<span class="nc" id="L61">    }</span>
+<span class="nc" id="L65">        repository.deleteAll();</span>
+<span class="nc" id="L66">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

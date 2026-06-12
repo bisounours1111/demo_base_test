@@ -21,6 +21,12 @@ Feature: Support ticket API
     Then the HTTP response should be 400
     And the response contains an error message
 
+  Scenario: Reject creation without priority
+    Given no ticket exists in the API
+    When I create a ticket with title "Valid title" and no priority
+    Then the HTTP response should be 400
+    And the response contains an error message
+
   Scenario: Ticket not found
     Given no ticket exists in the API
     When I request the ticket with id 99

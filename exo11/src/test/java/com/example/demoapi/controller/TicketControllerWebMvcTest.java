@@ -35,9 +35,11 @@ class TicketControllerWebMvcTest {
 
     @Test
     void shouldReturnCreated_whenPostBodyIsValid() throws Exception {
+        // Arrange
         when(service.create("Network issue", Priority.HIGH))
                 .thenReturn(new Ticket(1L, "Network issue", Priority.HIGH, TicketStatus.OPEN));
 
+        // Act + Assert
         mockMvc.perform(post("/api/tickets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"Network issue\",\"priority\":\"HIGH\"}"))
@@ -53,6 +55,7 @@ class TicketControllerWebMvcTest {
 
     @Test
     void shouldReturnBadRequest_whenPostBodyIsInvalid() throws Exception {
+        // Act + Assert
         mockMvc.perform(post("/api/tickets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"ab\",\"priority\":\"HIGH\"}"))
@@ -64,10 +67,25 @@ class TicketControllerWebMvcTest {
     }
 
     @Test
+    void shouldReturnBadRequest_whenPriorityIsMissing() throws Exception {
+        // Act + Assert
+        mockMvc.perform(post("/api/tickets")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Valid title\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Priority is required"));
+
+        verify(service, never()).create(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
     void shouldReturnOk_whenTicketExists() throws Exception {
+        // Arrange
         when(service.getById(1L))
                 .thenReturn(new Ticket(1L, "Existing ticket", Priority.MEDIUM, TicketStatus.OPEN));
 
+        // Act + Assert
         mockMvc.perform(get("/api/tickets/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
@@ -78,8 +96,10 @@ class TicketControllerWebMvcTest {
 
     @Test
     void shouldReturnNotFound_whenTicketDoesNotExist() throws Exception {
+        // Arrange
         when(service.getById(99L)).thenThrow(new TicketNotFoundException(99L));
 
+        // Act + Assert
         mockMvc.perform(get("/api/tickets/99"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
@@ -90,9 +110,11 @@ class TicketControllerWebMvcTest {
 
     @Test
     void shouldReturnConflict_whenStatusTransitionIsForbidden() throws Exception {
+        // Arrange
         when(service.updateStatus(eq(1L), eq(TicketStatus.IN_PROGRESS)))
                 .thenThrow(new InvalidStatusTransitionException(TicketStatus.RESOLVED, TicketStatus.IN_PROGRESS));
 
+        // Act + Assert
         mockMvc.perform(patch("/api/tickets/1/status")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"status\":\"IN_PROGRESS\"}"))

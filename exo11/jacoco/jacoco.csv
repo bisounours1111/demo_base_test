@@ -1,5 +1,5 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-demo-api-spring-tdd-bdd,com.example.demoapi.service,TicketService,9,94,1,5,2,19,3,9,2,7
+demo-api-spring-tdd-bdd,com.example.demoapi.service,TicketService,9,105,1,7,2,22,3,10,2,7
 demo-api-spring-tdd-bdd,com.example.demoapi.controller,TicketApiExceptionHandler,7,39,0,0,3,16,1,5,1,5
 demo-api-spring-tdd-bdd,com.example.demoapi.controller,TicketController,6,56,0,0,2,17,1,5,1,5
 demo-api-spring-tdd-bdd,com.example.demoapi.repository,InMemoryTicketRepository,0,70,0,0,0,17,0,6,0,6
