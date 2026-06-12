@@ -1,39 +1,53 @@
 package com.example.demoapi.repository;
 
-import com.example.demoapi.exception.NotImplementedException;
 import com.example.demoapi.model.Priority;
 import com.example.demoapi.model.Ticket;
 import com.example.demoapi.model.TicketStatus;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class InMemoryTicketRepository implements TicketRepository {
 
+    private final AtomicLong sequence = new AtomicLong(0);
+    private final Map<Long, Ticket> tickets = new ConcurrentHashMap<>();
+
     @Override
     public Ticket save(String title, Priority priority, TicketStatus status) {
-        throw new NotImplementedException("Ticket save is not implemented yet");
+        Long id = sequence.incrementAndGet();
+        Ticket ticket = new Ticket(id, title, priority, status);
+        tickets.put(id, ticket);
+        return ticket;
     }
 
     @Override
     public void update(Ticket ticket) {
-        throw new NotImplementedException("Ticket update is not implemented yet");
+        tickets.put(ticket.id(), ticket);
     }
 
     @Override
     public Optional<Ticket> findById(Long id) {
-        throw new NotImplementedException("Ticket findById is not implemented yet");
+        return Optional.ofNullable(tickets.get(id));
     }
 
     @Override
     public List<Ticket> findAll() {
-        throw new NotImplementedException("Ticket findAll is not implemented yet");
+        return new ArrayList<>(tickets.values())
+                .stream()
+                .sorted(Comparator.comparing(Ticket::id))
+                .toList();
     }
 
     @Override
     public void deleteAll() {
-        throw new NotImplementedException("Ticket deleteAll is not implemented yet");
+        tickets.clear();
+        sequence.set(0);
     }
 }

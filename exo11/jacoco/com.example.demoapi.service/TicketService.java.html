@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TicketService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo-api-spring-tdd-bdd</a> &gt; <a href="index.source.html" class="el_package">com.example.demoapi.service</a> &gt; <span class="el_source">TicketService.java</span></div><h1>TicketService.java</h1><pre class="source lang-java linenums">package com.example.demoapi.service;
+
+import com.example.demoapi.exception.InvalidStatusTransitionException;
+import com.example.demoapi.exception.TicketNotFoundException;
+import com.example.demoapi.model.Priority;
+import com.example.demoapi.model.Ticket;
+import com.example.demoapi.model.TicketStatus;
+import com.example.demoapi.repository.TicketRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+@Service
+public class TicketService {
+
+<span class="fc" id="L18">    private static final Map&lt;TicketStatus, Set&lt;TicketStatus&gt;&gt; ALLOWED_TRANSITIONS = Map.of(</span>
+<span class="fc" id="L19">            TicketStatus.OPEN, Set.of(TicketStatus.IN_PROGRESS, TicketStatus.RESOLVED),</span>
+<span class="fc" id="L20">            TicketStatus.IN_PROGRESS, Set.of(TicketStatus.RESOLVED)</span>
+    );
+
+    private final TicketRepository repository;
+
+<span class="fc" id="L25">    public TicketService(TicketRepository repository) {</span>
+<span class="fc" id="L26">        this.repository = repository;</span>
+<span class="fc" id="L27">    }</span>
+
+    public Ticket create(String title, Priority priority) {
+<span class="pc bpc" id="L30" title="1 of 4 branches missed.">        if (title == null || title.isBlank()) {</span>
+<span class="fc" id="L31">            throw new IllegalArgumentException(&quot;Title is required&quot;);</span>
+        }
+
+<span class="fc" id="L34">        return repository.save(title.trim(), priority, TicketStatus.OPEN);</span>
+    }
+
+    public Ticket getById(Long id) {
+<span class="fc" id="L38">        return repository.findById(id)</span>
+<span class="fc" id="L39">                .orElseThrow(() -&gt; new TicketNotFoundException(id));</span>
+    }
+
+    public List&lt;Ticket&gt; findAll() {
+<span class="fc" id="L43">        return repository.findAll();</span>
+    }
+
+    public Ticket updateStatus(Long id, TicketStatus status) {
+<span class="fc" id="L47">        var ticket = repository.findById(id)</span>
+<span class="pc" id="L48">                .orElseThrow(() -&gt; new TicketNotFoundException(id));</span>
+
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        if (!ALLOWED_TRANSITIONS.getOrDefault(ticket.status(), Set.of()).contains(status)) {</span>
+<span class="fc" id="L51">            throw new InvalidStatusTransitionException(ticket.status(), status);</span>
+        }
+
+<span class="fc" id="L54">        var updated = new Ticket(ticket.id(), ticket.title(), ticket.priority(), status);</span>
+<span class="fc" id="L55">        repository.update(updated);</span>
+<span class="fc" id="L56">        return updated;</span>
+    }
+
+    public void deleteAll() {
+<span class="nc" id="L60">        repository.deleteAll();</span>
+<span class="nc" id="L61">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
