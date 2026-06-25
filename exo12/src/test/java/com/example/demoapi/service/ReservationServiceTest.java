@@ -154,4 +154,96 @@ class ReservationServiceTest {
         verify(roomRepository, never()).findById(any());
         verify(reservationRepository, never()).save(any(Reservation.class));
     }
+
+    @Test
+    void shouldThrowException_whenReservedByIsNull() {
+        // Act + Assert
+        assertThrows(IllegalArgumentException.class, () -> service.create(1L, null, START, END));
+        verify(roomRepository, never()).findById(any());
+        verify(reservationRepository, never()).save(any(Reservation.class));
+    }
+
+    @Test
+    void shouldTrimReservedBy_whenCreatingReservation() {
+        // Arrange
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(new Room(1L, "Room A", 10)));
+        when(reservationRepository.findConfirmedByRoomId(1L)).thenReturn(List.of());
+        when(reservationRepository.save(any(Reservation.class)))
+                .thenReturn(new Reservation(1L, 1L, "Alice", START, END, ReservationStatus.CONFIRMED));
+
+        // Act
+        Reservation result = service.create(1L, "  Alice  ", START, END);
+
+        // Assert
+        assertEquals("Alice", result.reservedBy());
+        verify(reservationRepository).save(any(Reservation.class));
+    }
+
+    @Test
+    void shouldCreateReservation_whenExistingReservationDoesNotOverlap() {
+        // Arrange
+        var nonOverlapping = new Reservation(
+                1L, 1L, "Bob",
+                Instant.parse("2026-06-25T11:00:00Z"),
+                Instant.parse("2026-06-25T12:00:00Z"),
+                ReservationStatus.CONFIRMED
+        );
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(new Room(1L, "Room A", 10)));
+        when(reservationRepository.findConfirmedByRoomId(1L)).thenReturn(List.of(nonOverlapping));
+        when(reservationRepository.save(any(Reservation.class)))
+                .thenReturn(new Reservation(2L, 1L, "Alice", START, END, ReservationStatus.CONFIRMED));
+
+        // Act
+        Reservation result = service.create(1L, "Alice", START, END);
+
+        // Assert
+        assertEquals(2L, result.id());
+        verify(reservationRepository).save(any(Reservation.class));
+    }
+
+    @Test
+    void shouldCreateReservation_whenExistingReservationEndsBeforeNewSlot() {
+        // Arrange
+        var earlierReservation = new Reservation(
+                1L, 1L, "Bob",
+                Instant.parse("2026-06-25T08:00:00Z"),
+                Instant.parse("2026-06-25T09:00:00Z"),
+                ReservationStatus.CONFIRMED
+        );
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(new Room(1L, "Room A", 10)));
+        when(reservationRepository.findConfirmedByRoomId(1L)).thenReturn(List.of(earlierReservation));
+        when(reservationRepository.save(any(Reservation.class)))
+                .thenReturn(new Reservation(2L, 1L, "Alice", START, END, ReservationStatus.CONFIRMED));
+
+        // Act
+        Reservation result = service.create(1L, "Alice", START, END);
+
+        // Assert
+        assertEquals(2L, result.id());
+        verify(reservationRepository).save(any(Reservation.class));
+    }
+
+    @Test
+    void shouldReturnReservation_whenIdExists() {
+        // Arrange
+        var existing = new Reservation(1L, 1L, "Alice", START, END, ReservationStatus.CONFIRMED);
+        when(reservationRepository.findById(1L)).thenReturn(Optional.of(existing));
+
+        // Act
+        Reservation result = service.getById(1L);
+
+        // Assert
+        assertEquals("Alice", result.reservedBy());
+        verify(reservationRepository).findById(1L);
+    }
+
+    @Test
+    void shouldThrowNotFound_whenReservationDoesNotExist() {
+        // Arrange
+        when(reservationRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // Act + Assert
+        assertThrows(ReservationNotFoundException.class, () -> service.getById(99L));
+        verify(reservationRepository).findById(99L);
+    }
 }
