@@ -1,0 +1,8 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+room-reservation-api,com.example.demoapi.service,ReservationService,0,154,0,16,0,32,0,16,0,8
+room-reservation-api,com.example.demoapi.service,RoomService,0,35,0,6,0,9,0,6,0,3
+room-reservation-api,com.example.demoapi.controller,RoomController,11,25,0,0,5,8,1,2,1,2
+room-reservation-api,com.example.demoapi.controller,ReservationController,0,47,0,0,0,16,0,4,0,4
+room-reservation-api,com.example.demoapi.controller,ApiExceptionHandler,7,47,0,0,3,19,1,6,1,6
+room-reservation-api,com.example.demoapi.repository,InMemoryReservationRepository,1,94,1,1,0,24,1,8,0,8
+room-reservation-api,com.example.demoapi.repository,InMemoryRoomRepository,12,49,0,0,4,11,1,4,1,4

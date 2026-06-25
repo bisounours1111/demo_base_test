@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InMemoryReservationRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">room-reservation-api</a> &gt; <a href="index.source.html" class="el_package">com.example.demoapi.repository</a> &gt; <span class="el_source">InMemoryReservationRepository.java</span></div><h1>InMemoryReservationRepository.java</h1><pre class="source lang-java linenums">package com.example.demoapi.repository;
+
+import com.example.demoapi.model.Reservation;
+import com.example.demoapi.model.ReservationStatus;
+import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+
+@Repository
+<span class="fc" id="L16">public class InMemoryReservationRepository implements ReservationRepository {</span>
+
+<span class="fc" id="L18">    private final AtomicLong sequence = new AtomicLong(0);</span>
+<span class="fc" id="L19">    private final Map&lt;Long, Reservation&gt; reservations = new ConcurrentHashMap&lt;&gt;();</span>
+
+    @Override
+    public Reservation save(Reservation reservation) {
+<span class="fc" id="L23">        Long id = sequence.incrementAndGet();</span>
+<span class="fc" id="L24">        Reservation saved = new Reservation(</span>
+                id,
+<span class="fc" id="L26">                reservation.roomId(),</span>
+<span class="fc" id="L27">                reservation.reservedBy(),</span>
+<span class="fc" id="L28">                reservation.startTime(),</span>
+<span class="fc" id="L29">                reservation.endTime(),</span>
+<span class="fc" id="L30">                reservation.status()</span>
+        );
+<span class="fc" id="L32">        reservations.put(id, saved);</span>
+<span class="fc" id="L33">        return saved;</span>
+    }
+
+    @Override
+    public Optional&lt;Reservation&gt; findById(Long id) {
+<span class="fc" id="L38">        return Optional.ofNullable(reservations.get(id));</span>
+    }
+
+    @Override
+    public List&lt;Reservation&gt; findConfirmedByRoomId(Long roomId) {
+<span class="fc" id="L43">        return new ArrayList&lt;&gt;(reservations.values())</span>
+<span class="fc" id="L44">                .stream()</span>
+<span class="fc" id="L45">                .filter(reservation -&gt; reservation.roomId().equals(roomId))</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">                .filter(reservation -&gt; reservation.status() == ReservationStatus.CONFIRMED)</span>
+<span class="fc" id="L47">                .sorted(Comparator.comparing(Reservation::id))</span>
+<span class="fc" id="L48">                .toList();</span>
+    }
+
+    @Override
+    public void update(Reservation reservation) {
+<span class="fc" id="L53">        reservations.put(reservation.id(), reservation);</span>
+<span class="fc" id="L54">    }</span>
+
+    @Override
+    public void deleteAll() {
+<span class="fc" id="L58">        reservations.clear();</span>
+<span class="fc" id="L59">        sequence.set(0);</span>
+<span class="fc" id="L60">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
