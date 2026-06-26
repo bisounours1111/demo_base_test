@@ -39,8 +39,7 @@ jobs:
         with:
           name: rapports-tests-maven
           path: |
-            target/surefire-reports/**
-            target/failsafe-reports/**
+            exo12/target/surefire-reports/**
           if-no-files-found: warn
 
       - name: Publier le rapport de couverture JaCoCo
@@ -48,7 +47,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rapport-jacoco
-          path: target/site/jacoco/**
+          path: exo12/target/site/jacoco/**
           if-no-files-found: warn
 
       - name: Publier les rapports Cucumber BDD
@@ -57,7 +56,6 @@ jobs:
         with:
           name: rapports-cucumber-bdd
           path: |
-            target/cucumber-reports/**
-            target/cucumber-report.html
-            target/cucumber.json
+            exo12/target/cucumber-report.html
+            exo12/target/cucumber-report.json
           if-no-files-found: warn
