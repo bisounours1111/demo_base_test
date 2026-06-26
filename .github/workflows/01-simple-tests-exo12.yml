@@ -33,28 +33,28 @@ jobs:
       - name: Run maven tests
         run: mvn clean verify
 
-      - name: Publier les rapports de tests Maven
+      - name: Upload Maven test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: rapports-tests-maven
+          name: maven-test-reports
           path: |
             exo12/target/surefire-reports/**
           if-no-files-found: warn
 
-      - name: Publier le rapport de couverture JaCoCo
+      - name: Upload JaCoCo report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: rapport-jacoco
+          name: jacoco-report
           path: exo12/target/site/jacoco/**
           if-no-files-found: warn
 
-      - name: Publier les rapports Cucumber BDD
+      - name: Upload Cucumber reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: rapports-cucumber-bdd
+          name: cucumber-reports
           path: |
             exo12/target/cucumber-report.html
             exo12/target/cucumber-report.json

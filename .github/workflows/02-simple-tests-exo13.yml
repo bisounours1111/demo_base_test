@@ -1,4 +1,4 @@
-name: Maven CI
+name: Simple Tests Exo13
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
 
 jobs:
   test:
-    name: Build and test (exo13)
+    name: run test exo13
     runs-on: ubuntu-latest
     defaults:
       run:
