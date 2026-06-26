@@ -11,6 +11,8 @@ public interface AccountRepository {
 
     Account save(String number, String holder);
 
+    Account update(Account account);
+
     Optional<Account> findByNumber(String number);
 
     List<Account> findAll();

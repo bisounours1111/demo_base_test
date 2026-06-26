@@ -29,6 +29,12 @@ public class InMemoryAccountRepository implements AccountRepository {
     }
 
     @Override
+    public Account update(Account account) {
+        accounts.put(account.number(), account);
+        return account;
+    }
+
+    @Override
     public Optional<Account> findByNumber(String number) {
         return Optional.ofNullable(accounts.get(number));
     }
