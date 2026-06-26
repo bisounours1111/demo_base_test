@@ -15,4 +15,8 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     default Account save(String number, String holder) {
         return save(new Account(number, holder, BigDecimal.ZERO));
     }
+
+    default Account update(Account account) {
+        return save(account);
+    }
 }
