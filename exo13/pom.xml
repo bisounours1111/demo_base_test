@@ -139,7 +139,7 @@
                         <exclude>com/example/demoapi/model/*.class</exclude>
                         <exclude>com/example/demoapi/model/**/*.class</exclude>
                         <exclude>com/example/demoapi/bdd/CucumberSpringConfiguration.class</exclude>
-                        <exclude>com/example/demoapi/bdd/RunCucumberTest.class</exclude>
+                        <exclude>com/example/demoapi/bdd/CucumberTest.class</exclude>
                         <exclude>com/example/demoapi/exception/*.class</exclude>
                         <exclude>com/example/demoapi/exception/**/*.class</exclude>
                     </excludes>
