@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ApiExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo-api-spring-tdd-bdd</a> &gt; <a href="index.source.html" class="el_package">com.example.demoapi.controller</a> &gt; <span class="el_source">ApiExceptionHandler.java</span></div><h1>ApiExceptionHandler.java</h1><pre class="source lang-java linenums">package com.example.demoapi.controller;
+
+import com.example.demoapi.exception.AccountNotFoundException;
+import com.example.demoapi.exception.DuplicateAccountException;
+import com.example.demoapi.exception.InsufficientFundsException;
+import com.example.demoapi.exception.InvalidAmountException;
+import com.example.demoapi.model.ApiError;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+<span class="fc" id="L15">public class ApiExceptionHandler {</span>
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity&lt;ApiError&gt; handleAccountNotFound(AccountNotFoundException exception) {
+<span class="fc" id="L19">        return ResponseEntity</span>
+<span class="fc" id="L20">                .status(HttpStatus.NOT_FOUND)</span>
+<span class="fc" id="L21">                .body(ApiError.of(404, exception.getMessage()));</span>
+    }
+
+    @ExceptionHandler(DuplicateAccountException.class)
+    public ResponseEntity&lt;ApiError&gt; handleDuplicateAccount(DuplicateAccountException exception) {
+<span class="fc" id="L26">        return ResponseEntity</span>
+<span class="fc" id="L27">                .status(HttpStatus.CONFLICT)</span>
+<span class="fc" id="L28">                .body(ApiError.of(409, exception.getMessage()));</span>
+    }
+
+    @ExceptionHandler({InvalidAmountException.class, InsufficientFundsException.class, IllegalArgumentException.class})
+    public ResponseEntity&lt;ApiError&gt; handleBadRequest(RuntimeException exception) {
+<span class="fc" id="L33">        return ResponseEntity</span>
+<span class="fc" id="L34">                .badRequest()</span>
+<span class="fc" id="L35">                .body(ApiError.of(400, exception.getMessage()));</span>
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;ApiError&gt; handleValidation(MethodArgumentNotValidException exception) {
+<span class="fc" id="L40">        var message = exception.getBindingResult()</span>
+<span class="fc" id="L41">                .getFieldErrors()</span>
+<span class="fc" id="L42">                .stream()</span>
+<span class="fc" id="L43">                .findFirst()</span>
+<span class="fc" id="L44">                .map(error -&gt; error.getDefaultMessage())</span>
+<span class="fc" id="L45">                .orElse(&quot;Invalid request&quot;);</span>
+
+<span class="fc" id="L47">        return ResponseEntity</span>
+<span class="fc" id="L48">                .badRequest()</span>
+<span class="fc" id="L49">                .body(ApiError.of(400, message));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
